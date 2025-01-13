@@ -1,5 +1,7 @@
 <RCC>
   <qresource prefix="ico">
+    <file>ico/logo.ico.png</file>
+    <file>ico/atualizar_sistema.webp</file>
     <file>ico/filtro.png</file>
     <file>ico/vizualizar.png</file>
     <file>ico/cancelar.png</file>
