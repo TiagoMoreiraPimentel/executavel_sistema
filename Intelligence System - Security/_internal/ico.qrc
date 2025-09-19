@@ -1,6 +1,8 @@
 <RCC>
   <qresource prefix="ico">
     <file>ico/logo.ico.png</file>
+    <file>ico/seta_baixo.png</file>
+    <file>INCON.png</file>
     <file>ico/BUTTON_BASE.png</file>
     <file>ico/atualizar_sistema.webp</file>
     <file>ico/filtro.png</file>
