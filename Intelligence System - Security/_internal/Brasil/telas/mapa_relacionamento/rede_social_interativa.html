@@ -1,0 +1,579 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750px;
+                 background-color: #222222;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            
+    <div style="padding: 15px; background: #333; color: white; border-bottom: 2px solid #555; display: flex; align-items: center; justify-content: space-between; z-index: 100;">
+        <div style="display: flex; align-items: center;">
+            <label for="searchBox" style="margin-right: 15px; font-size: 1.1em; font-weight: bold;">🔎 Buscar Pessoa:</label>
+            <input type="text" id="searchBox" placeholder="Nome ou CPF" style="padding: 10px; width: 350px; border: 1px solid #666; border-radius: 5px; background: #444; color: white; font-size: 1em;">
+            <button id="searchBtn" style="padding: 10px 20px; margin-left: 15px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Buscar</button>
+            <button id="resetBtn" style="padding: 10px 20px; margin-left: 10px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Limpar</button>
+            <span id="searchStatus" style="margin-left: 30px; font-weight: bold;"></span>
+        </div>
+
+        <div style="font-size: 0.9em; display: flex;">
+            <span style="display: flex; align-items: center; margin-right: 30px;">
+                <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #139DD4; margin-right: 5px;"></span>
+                Colaborador (RE)
+            </span>
+            <span style="display: flex; align-items: center;">
+                <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #079606; margin-right: 5px;"></span>
+                Motorista (CPF)
+            </span>
+        </div>
+    </div>
+    <div id="mynetwork" style="height: calc(100vh - 60px); background: #222222; border-top: none;"></div>
+    
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#139DD4", "font": {"color": "white"}, "id": "100494", "label": "FABIO PASSOS DE MEDEIROS", "shape": "dot", "size": 15, "title": "Nome: FABIO PASSOS DE MEDEIROS\nAtividade: SUPERVISOR DE OPERA\u00c7\u00d5ES\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9817098", "label": "VANDERSON INACIO DE LIMA", "shape": "dot", "size": 15, "title": "Nome: VANDERSON INACIO DE LIMA\nAtividade: COORDENADOR DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "100865", "label": "SILVANO MARQUES DE OLIVEIRA", "shape": "dot", "size": 15, "title": "Nome: SILVANO MARQUES DE OLIVEIRA\nAtividade: COORDENADOR DE OPERA\u00c7\u00d5ES\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9863001", "label": "DANIEL DE JESUS ESTEVAM", "shape": "dot", "size": 15, "title": "Nome: DANIEL DE JESUS ESTEVAM\nAtividade: AUXILIAR DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "101021", "label": "MARCIA DE OLIVEIRA PEREIRA", "shape": "dot", "size": 15, "title": "Nome: MARCIA DE OLIVEIRA PEREIRA\nAtividade: ANALISTA DE ATENDIMENTO AO CLIENTE JR\nSite: UNIDOCKS ASSES LOG MAT LTDA - AGUA CHATA\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "101135", "label": "CARLOS GOES DA SILVA", "shape": "dot", "size": 15, "title": "Nome: CARLOS GOES DA SILVA\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "101207", "label": "MARTA HELENA DE OLIVEIRA", "shape": "dot", "size": 15, "title": "Nome: MARTA HELENA DE OLIVEIRA\nAtividade: CONFERENTE\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9852967", "label": "JONATAS DA SILVA ARAUJO", "shape": "dot", "size": 15, "title": "Nome: JONATAS DA SILVA ARAUJO\nAtividade: AUXILIAR LOGISTICO I\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "101539", "label": "VAGNER LOIOLA DOS SANTOS", "shape": "dot", "size": 15, "title": "Nome: VAGNER LOIOLA DOS SANTOS\nAtividade: AUXILIAR LOGISTICO I\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9831403", "label": "PAULO ALVES APOLINARIO JUNIOR", "shape": "dot", "size": 15, "title": "Nome: PAULO ALVES APOLINARIO JUNIOR\nAtividade: AUXILIAR LOGISTICO II\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "101711", "label": "ELISANGELA ALVES DE SOUSA", "shape": "dot", "size": 15, "title": "Nome: ELISANGELA ALVES DE SOUSA\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "500014", "label": "VALTER GABRIEL RODRIGUES", "shape": "dot", "size": 15, "title": "Nome: VALTER GABRIEL RODRIGUES\nAtividade: SUPERVISOR DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "500063", "label": "AURELIO FORTUNATO", "shape": "dot", "size": 15, "title": "Nome: AURELIO FORTUNATO\nAtividade: OPERADOR DE EMPILHADEIRA ESPECIALISTA\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "500108", "label": "EDMILSON FERRAREZ ALVES", "shape": "dot", "size": 15, "title": "Nome: EDMILSON FERRAREZ ALVES\nAtividade: ASSISTENTE DE INVENTARIO\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "1234567", "label": "MATHEUS RECCO DA ROCHA", "shape": "dot", "size": 15, "title": "Nome: MATHEUS RECCO DA ROCHA\nAtividade: AUXILIAR MONITORAMENTO\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9812005", "label": "DANIEL MAIA DE BRITO", "shape": "dot", "size": 15, "title": "Nome: DANIEL MAIA DE BRITO\nAtividade: COORDENADOR DE OPERA\u00c7\u00d5ES\nSite: DHL LOGISTICS BRAZIL LTDA - CAJAMAR\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9815889", "label": "VANDERLEI TAVARES DE CARVALHO", "shape": "dot", "size": 15, "title": "Nome: VANDERLEI TAVARES DE CARVALHO\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9823668", "label": "GUSTAVO PIRES DE SOUZA", "shape": "dot", "size": 15, "title": "Nome: GUSTAVO PIRES DE SOUZA\nAtividade: ANALISTA DE SISTEMAS OPERACIONAIS PL\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: 258934\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9826376", "label": "GILVAN DE JESUS LEANDRO", "shape": "dot", "size": 15, "title": "Nome: GILVAN DE JESUS LEANDRO\nAtividade: ASSISTENTE DE LOGISTICA\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9833790", "label": "VALDECIO ELOI MARQUES JUNIOR", "shape": "dot", "size": 15, "title": "Nome: VALDECIO ELOI MARQUES JUNIOR\nAtividade: AUXILIAR LOGISTICO II\nSite: VALDECIO ELOI MARQUES JUNIOR\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9850591", "label": "DAVYLA DAYLHA DA SILVA MATOS", "shape": "dot", "size": 15, "title": "Nome: DAVYLA DAYLHA DA SILVA MATOS\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9858386", "label": "YGOR LIMA AMARAL", "shape": "dot", "size": 15, "title": "Nome: YGOR LIMA AMARAL\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9865115", "label": "MANASSES BEZERRA DA SILVA", "shape": "dot", "size": 15, "title": "Nome: MANASSES BEZERRA DA SILVA\nAtividade: AUXILIAR DE MONITORAMENTO II\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: INDIRETO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9874429", "label": "KAIQUE KAUAN MARTINS ARAUJO", "shape": "dot", "size": 15, "title": "Nome: KAIQUE KAUAN MARTINS ARAUJO\nAtividade: ANALISTA DE TRANSPORTES JR\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "1409735", "label": "RONNY PACHECO ALMADA", "shape": "dot", "size": 15, "title": "Nome: RONNY PACHECO ALMADA\nAtividade: DIRETOR DE OPERA\u00c7\u00d5ES\nSite: UNIDOCKS ASSES LOG MAT LTDA - CONTROL TOWER\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9805251", "label": "MURILLO DIAS SANTANA", "shape": "dot", "size": 15, "title": "Nome: MURILLO DIAS SANTANA\nAtividade: GERENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "1417932", "label": "FABIANO CORREIA SANTANA", "shape": "dot", "size": 15, "title": "Nome: FABIANO CORREIA SANTANA\nAtividade: ANALISTA DE TRANSPORTES JR\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "1454480", "label": "FABIO JUNIO DE FREITAS SILVA", "shape": "dot", "size": 15, "title": "Nome: FABIO JUNIO DE FREITAS SILVA\nAtividade: ANALISTA FINANCEIRO SR\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "2001098", "label": "MARCIO DA COSTA BASSO BALLERINI", "shape": "dot", "size": 15, "title": "Nome: MARCIO DA COSTA BASSO BALLERINI\nAtividade: SUPERVISOR FINANCEIRO\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "2701668", "label": "FERNANDA CRISTINA ALVES DE ALCANTARA", "shape": "dot", "size": 15, "title": "Nome: FERNANDA CRISTINA ALVES DE ALCANTARA\nAtividade: DIRETOR DE DESENVOLVIMENTO DE SETOR\nSite: DHL LOGISTICS BRAZIL LTDA - CAMPINAS\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9000026", "label": "FABIO SIMOES TUCA", "shape": "dot", "size": 15, "title": "Nome: FABIO SIMOES TUCA\nAtividade: SUPERVISOR DE OPERA\u00c7\u00d5ES\nSite: DHL LOGISTICS BRAZIL LTDA - INDAIATUBA\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9002120", "label": "CELSO SEIKI HARUNA", "shape": "dot", "size": 15, "title": "Nome: CELSO SEIKI HARUNA\nAtividade: GERENTE DE TECNOLOGIA DA INFORMA\u00c7\u00c3O SR\nSite: UNIDOCKS ASSES LOG MAT LTDA - CAMPINAS\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9800942", "label": "MARCELA NUNES LEPRE RODRIGUES", "shape": "dot", "size": 15, "title": "Nome: MARCELA NUNES LEPRE RODRIGUES\nAtividade: SUPERVISOR DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9803851", "label": "INGRID MILANTE DA CRUZ", "shape": "dot", "size": 15, "title": "Nome: INGRID MILANTE DA CRUZ\nAtividade: ANALISTA DE TRANSPORTES JR\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9805555", "label": "LAIS BELISARIO SARDINHA", "shape": "dot", "size": 15, "title": "Nome: LAIS BELISARIO SARDINHA\nAtividade: GERENTE REG CONTAS E COMPRAS LLP SR\nSite: UNIDOCKS ASSES LOG MAT LTDA - CAMPINAS\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9808921", "label": "FERNANDA DE FRANCA CABRAL", "shape": "dot", "size": 15, "title": "Nome: FERNANDA DE FRANCA CABRAL\nAtividade: SUPERVISOR DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9809242", "label": "ROGERIO DE SOUSA BARRETO", "shape": "dot", "size": 15, "title": "Nome: ROGERIO DE SOUSA BARRETO\nAtividade: SUPERVISOR DE OPERA\u00c7\u00d5ES\nSite: UNIDOCKS ASSES LOG MAT LTDA - ARAPONGAS\nIncidentes: N/A\nMotivos: INDIRETO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9809404", "label": "LUCIANA VIUDES SALGADO", "shape": "dot", "size": 15, "title": "Nome: LUCIANA VIUDES SALGADO\nAtividade: ANALISTA DE SISTEMAS OPERACIONAIS SR\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9809567", "label": "MAICON ANTUNES ALVES", "shape": "dot", "size": 15, "title": "Nome: MAICON ANTUNES ALVES\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - AEROPORTO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9811343", "label": "ANDREZA CRISTOVAO BARBOSA SILVA", "shape": "dot", "size": 15, "title": "Nome: ANDREZA CRISTOVAO BARBOSA SILVA\nAtividade: ANALISTA DE TRANSPORTES PL\nSite: UNIDOCKS ASSES LOG MAT LTDA - AEROPORTO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9812843", "label": "THAIS RIBEIRO DE SOUZA", "shape": "dot", "size": 15, "title": "Nome: THAIS RIBEIRO DE SOUZA\nAtividade: ANALISTA DE TRANSPORTES JR\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9816791", "label": "RENAN MOREIRA DE ALVORADO", "shape": "dot", "size": 15, "title": "Nome: RENAN MOREIRA DE ALVORADO\nAtividade: COORDENADOR DE FILIAL DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9817483", "label": "THAIS COSTA CORREA", "shape": "dot", "size": 15, "title": "Nome: THAIS COSTA CORREA\nAtividade: GERENTE DE QUALIDADE\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9819955", "label": "FELIPE PADOVAN", "shape": "dot", "size": 15, "title": "Nome: FELIPE PADOVAN\nAtividade: COORDENADOR ADMINISTRATIVO\nSite: UNIDOCKS ASSES LOG MAT LTDA - CAMPINAS\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9821280", "label": "MARINA DOS SANTOS RAFACHO", "shape": "dot", "size": 15, "title": "Nome: MARINA DOS SANTOS RAFACHO\nAtividade: GERENTE DE OPERACOES\nSite: DHL LOGISTICS BRAZIL LTDA - JARINU\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9823262", "label": "ANDERSON FASSINA", "shape": "dot", "size": 15, "title": "Nome: ANDERSON FASSINA\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9823824", "label": "DAVID MIRA AMORIM", "shape": "dot", "size": 15, "title": "Nome: DAVID MIRA AMORIM\nAtividade: SUPERVISOR DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9824944", "label": "IRACI JESUS DOS SANTOS", "shape": "dot", "size": 15, "title": "Nome: IRACI JESUS DOS SANTOS\nAtividade: ASSISTENTE ADMINISTRATIVO\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9829357", "label": "VANDER MEDEIRO", "shape": "dot", "size": 15, "title": "Nome: VANDER MEDEIRO\nAtividade: COORDENADOR DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9837049", "label": "GABRIELA LIMA GOMES", "shape": "dot", "size": 15, "title": "Nome: GABRIELA LIMA GOMES\nAtividade: ANALISTA FINANCEIRO JR\nSite: UNIDOCKS ASSES LOG MAT LTDA - SAO PAULO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9847437", "label": "HEITOR CASADO BERTONI", "shape": "dot", "size": 15, "title": "Nome: HEITOR CASADO BERTONI\nAtividade: TSP\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9848649", "label": "PAULO RICARDO MONARI", "shape": "dot", "size": 15, "title": "Nome: PAULO RICARDO MONARI\nAtividade: SUPERVISOR DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9864871", "label": "EVERALDO ANDRE DA SILVA", "shape": "dot", "size": 15, "title": "Nome: EVERALDO ANDRE DA SILVA\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - FAZENDA VELHA\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9881513", "label": "CLEITON LIMA DA SILVA", "shape": "dot", "size": 15, "title": "Nome: CLEITON LIMA DA SILVA\nAtividade: AUXILIAR LOGISTICO I\nSite: DHL LOGISTICS BRAZIL LTDA - VINHEDO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9887513", "label": "ERICA PRESCILIANO ASSIS FERNANDES", "shape": "dot", "size": 15, "title": "Nome: ERICA PRESCILIANO ASSIS FERNANDES\nAtividade: AUXILIAR DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - AEROPORTO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9807721", "label": "KENNED SADI DE FRANCA", "shape": "dot", "size": 15, "title": "Nome: KENNED SADI DE FRANCA\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9813965", "label": "FABIO RODRIGO DE OLIVEIRA", "shape": "dot", "size": 15, "title": "Nome: FABIO RODRIGO DE OLIVEIRA\nAtividade: CONFERENTE\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9816439", "label": "JACKELINE SILVA CARDOSO", "shape": "dot", "size": 15, "title": "Nome: JACKELINE SILVA CARDOSO\nAtividade: CONFERENTE\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9816725", "label": "RENAN SANTOS DE OLIVEIRA", "shape": "dot", "size": 15, "title": "Nome: RENAN SANTOS DE OLIVEIRA\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9817326", "label": "EVERTON FREITAS FIDELIS", "shape": "dot", "size": 15, "title": "Nome: EVERTON FREITAS FIDELIS\nAtividade: ASSISTENTE DE INVENTARIO\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9817653", "label": "JOSIANE RIBEIRO DA SILVA", "shape": "dot", "size": 15, "title": "Nome: JOSIANE RIBEIRO DA SILVA\nAtividade: AUXILIAR LOGISTICO II\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9817971", "label": "CARLOS VINICIUS MARCULINO DA SILVA", "shape": "dot", "size": 15, "title": "Nome: CARLOS VINICIUS MARCULINO DA SILVA\nAtividade: ASSISTENTE DE TAREFAS\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9818776", "label": "CLAYTON MARTINS ALVES", "shape": "dot", "size": 15, "title": "Nome: CLAYTON MARTINS ALVES\nAtividade: ASSISTENTE DE TAREFAS\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: INDIRETO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9819557", "label": "JOSE AUGUSTO ALVES DA LUZ", "shape": "dot", "size": 15, "title": "Nome: JOSE AUGUSTO ALVES DA LUZ\nAtividade: OPERADOR DE EMPILHADEIRA\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9823302", "label": "SELMA PINHEIRO FELIX", "shape": "dot", "size": 15, "title": "Nome: SELMA PINHEIRO FELIX\nAtividade: ANALISTA DE TRANSPORTES JR\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9824650", "label": "RONIELLI FERNANDES DA SILVA", "shape": "dot", "size": 15, "title": "Nome: RONIELLI FERNANDES DA SILVA\nAtividade: COORDENADOR DE SISTEMAS OPERACIONAIS\nSite: UNIDOCKS ASSES LOG MAT LTDA - CAMPINAS\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9825515", "label": "LAISE CRISTINA DOS SANTOS", "shape": "dot", "size": 15, "title": "Nome: LAISE CRISTINA DOS SANTOS\nAtividade: ASSISTENTE DE TRANSPORTES\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: 260516\nMotivos: INDIRETO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9827561", "label": "SILVANA QUINA DOS SANTOS", "shape": "dot", "size": 15, "title": "Nome: SILVANA QUINA DOS SANTOS\nAtividade: ASSISTENTE OPERACIONAL\nSite: UNIDOCKS ASSES LOG MAT LTDA - AGUA CHATA\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9828698", "label": "BRUNO CAMPOS DOS SANTOS", "shape": "dot", "size": 15, "title": "Nome: BRUNO CAMPOS DOS SANTOS\nAtividade: ASSISTENTE DE INVENTARIO\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9836904", "label": "JAILSON SILVA SANTOS", "shape": "dot", "size": 15, "title": "Nome: JAILSON SILVA SANTOS\nAtividade: OPERADOR DE EMPILHADEIRA\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9857927", "label": "TAINARA NOGUEIRA PEREIRA", "shape": "dot", "size": 15, "title": "Nome: TAINARA NOGUEIRA PEREIRA\nAtividade: AUXILIAR DE INVENTARIO\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9866308", "label": "MARIA RUBIA SILVA SOUZA", "shape": "dot", "size": 15, "title": "Nome: MARIA RUBIA SILVA SOUZA\nAtividade: AUXILIAR LOGISTICO II\nSite: DHL LOGISTICS BRAZIL LTDA - ARACARIGUAMA\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9873906", "label": "PAULO HENRIQUE FERMIANO DE OLIVEIRA", "shape": "dot", "size": 15, "title": "Nome: PAULO HENRIQUE FERMIANO DE OLIVEIRA\nAtividade: AUXILIAR LOGISTICO I\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9876782", "label": "THAYNA OLIVEIRA DA SILVA", "shape": "dot", "size": 15, "title": "Nome: THAYNA OLIVEIRA DA SILVA\nAtividade: AUXILIAR LOGISTICO II\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9884410", "label": "BIANCA BATISTA DA SILVA", "shape": "dot", "size": 15, "title": "Nome: BIANCA BATISTA DA SILVA\nAtividade: AUXILIAR LOGISTICO I 180H\nSite: UNIDOCKS ASSES LOG MAT LTDA - LIMEIRA\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9817100", "label": "ALLAN DOS SANTOS FONTES", "shape": "dot", "size": 15, "title": "Nome: ALLAN DOS SANTOS FONTES\nAtividade: ASSISTENTE DE TAREFAS\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9822129", "label": "LEONARDO DE MENEZES GUIMARAES", "shape": "dot", "size": 15, "title": "Nome: LEONARDO DE MENEZES GUIMARAES\nAtividade: ASSISTENTE DE TAREFAS\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9823799", "label": "PRISCILA SANTANA PEREIRA", "shape": "dot", "size": 15, "title": "Nome: PRISCILA SANTANA PEREIRA\nAtividade: COORDENADOR DE OPERA\u00c7\u00d5ES\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9824105", "label": "ROGERIO JOSE VELOSO", "shape": "dot", "size": 15, "title": "Nome: ROGERIO JOSE VELOSO\nAtividade: AUXILIAR LOGISTICO II\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: 258934\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9857983", "label": "FLAVIANA JESUS DE LIMA", "shape": "dot", "size": 15, "title": "Nome: FLAVIANA JESUS DE LIMA\nAtividade: MOTORISTA VEICULO SEMI PESADO\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: 258934\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9828718", "label": "IGOR ANTONIO COSTA", "shape": "dot", "size": 15, "title": "Nome: IGOR ANTONIO COSTA\nAtividade: ASSISTENTE DE TAREFAS\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9829013", "label": "MEULI CAROLINA DE ARAGAO", "shape": "dot", "size": 15, "title": "Nome: MEULI CAROLINA DE ARAGAO\nAtividade: COORDENADOR DE MONITORAMENTO\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: INDIRETO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9864830", "label": "MARCOS MATHEUS DA SILVA PEREZ", "shape": "dot", "size": 15, "title": "Nome: MARCOS MATHEUS DA SILVA PEREZ\nAtividade: AUXILIAR MONITORAMENTO II\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: INDIRETO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9829168", "label": "GUILHERME HENRIQUE DE OLIVEIRA SANTOS", "shape": "dot", "size": 15, "title": "Nome: GUILHERME HENRIQUE DE OLIVEIRA SANTOS\nAtividade: OPERADOR DE EMPILHADEIRA\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9830687", "label": "GUSTAVO MIRANDA DA SILVA", "shape": "dot", "size": 15, "title": "Nome: GUSTAVO MIRANDA DA SILVA\nAtividade: COORDENADOR DE OPERA\u00c7\u00d5ES\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9871070", "label": "ISABELA DE SOUZA BUENO", "shape": "dot", "size": 15, "title": "Nome: ISABELA DE SOUZA BUENO\nAtividade: AUXILIAR LOGISTICO I\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: N/A\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9835573", "label": "EDUARDO PAULO AMARAL", "shape": "dot", "size": 15, "title": "Nome: EDUARDO PAULO AMARAL\nAtividade: AUXILIAR LOGISTICO I\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9845997", "label": "LAYLLA BEATRIZ JOVITA DOS SANTOS", "shape": "dot", "size": 15, "title": "Nome: LAYLLA BEATRIZ JOVITA DOS SANTOS\nAtividade: ANALISTA FINANCEIRO JR\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9849375", "label": "CLOVIS LACERDA DA SILVA", "shape": "dot", "size": 15, "title": "Nome: CLOVIS LACERDA DA SILVA\nAtividade: AUXILIAR LOGISTICO I\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: INDIRETO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9851857", "label": "TATIANA APARECIDA DA SILVA LOURENCO", "shape": "dot", "size": 15, "title": "Nome: TATIANA APARECIDA DA SILVA LOURENCO\nAtividade: AUXILIAR LOGISTICO I\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9871675", "label": "BEATRIZ LIMA BATISTA BARROS", "shape": "dot", "size": 15, "title": "Nome: BEATRIZ LIMA BATISTA BARROS\nAtividade: AUXILIAR LOGISTICO I - HAB\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9873879", "label": "MARIANA CARDOSO ABEL", "shape": "dot", "size": 15, "title": "Nome: MARIANA CARDOSO ABEL\nAtividade: AUXILIAR LOGISTICO I\nSite: UNIDOCKS ASSES LOG MAT LTDA - OSASCO\nIncidentes: 260516\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9855332", "label": "GIOVANNA OLIVEIRA E SILVA", "shape": "dot", "size": 15, "title": "Nome: GIOVANNA OLIVEIRA E SILVA\nAtividade: ANALISTA DE ATENDIMENTO AO CLIENTE JR\nSite: UNIDOCKS ASSES LOG MAT LTDA - AGUA CHATA\nIncidentes: 260516\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9866822", "label": "RIZELIA MACARE DE ALMEIDA SANTOS", "shape": "dot", "size": 15, "title": "Nome: RIZELIA MACARE DE ALMEIDA SANTOS\nAtividade: MOTORISTA VEICULO SEMI PESADO\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: 258934\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9869168", "label": "JANAINA PEREIRA DE SOUSA", "shape": "dot", "size": 15, "title": "Nome: JANAINA PEREIRA DE SOUSA\nAtividade: MOTORISTA VEICULO SEMI PESADO\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: 258934\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: N/A"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9871080", "label": "BRUNA DA SILVA ALBUQUERQUE", "shape": "dot", "size": 15, "title": "Nome: BRUNA DA SILVA ALBUQUERQUE\nAtividade: MOTORISTA VEICULO SEMI PESADO\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: 258934\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: Rela\u00e7\u00e3o de sinistro"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9859455", "label": "MATEUS DOS SANTOS FEITOSA", "shape": "dot", "size": 15, "title": "Nome: MATEUS DOS SANTOS FEITOSA\nAtividade: AUXILIAR LOGISTICO II\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: 260516\nMotivos: INDIRETO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9863198", "label": "RAFAEL ZAMPIER", "shape": "dot", "size": 15, "title": "Nome: RAFAEL ZAMPIER\nAtividade: ASSISTENTE DE TAREFAS\nSite: UNIDOCKS ASSES LOG MAT LTDA - AGUA CHATA\nIncidentes: 260516\nMotivos: SUSPEITO\nDescri\u00e7\u00f5es: SUSPEITA EM ESQUEMA"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9866650", "label": "LILIANE VENTURINI", "shape": "dot", "size": 15, "title": "Nome: LILIANE VENTURINI\nAtividade: AUXILIAR DE MONITORAMENTO II\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: INDIRETO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}, {"color": "#139DD4", "font": {"color": "white"}, "id": "9869330", "label": "PALOMA LUCIANA GUEDES DOS SANTOS", "shape": "dot", "size": 15, "title": "Nome: PALOMA LUCIANA GUEDES DOS SANTOS\nAtividade: AUXILIAR DE MONITORAMENTO II\nSite: UNIDOCKS ASSES LOG MAT LTDA - BARUERI\nIncidentes: N/A\nMotivos: SINISTRO\nDescri\u00e7\u00f5es: AMIGO NA REDE SOCIAL"}]);
+                  edges = new vis.DataSet([{"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "100494", "label": "REDES SOCIAIS", "to": "9817098", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "100865", "label": "REDES SOCIAIS", "to": "9863001", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "101021", "label": "REDES SOCIAIS", "to": "9863001", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "101135", "label": "REDES SOCIAIS", "to": "9863001", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "101207", "label": "REDES SOCIAIS", "to": "9817098", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "101207", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "101539", "label": "REDES SOCIAIS", "to": "9831403", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "101711", "label": "REDES SOCIAIS", "to": "9863001", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "500014", "label": "REDES SOCIAIS", "to": "9817098", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "500063", "label": "REDES SOCIAIS", "to": "9817098", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "500063", "label": "REDES SOCIAIS", "to": "9831403", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "500108", "label": "REDES SOCIAIS", "to": "9831403", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1234567", "label": "REDES SOCIAIS", "to": "9812005", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1234567", "label": "REDES SOCIAIS", "to": "9815889", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1234567", "label": "REDES SOCIAIS", "to": "9823668", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1234567", "label": "REDES SOCIAIS", "to": "9826376", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1234567", "label": "REDES SOCIAIS", "to": "9833790", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1234567", "label": "REDES SOCIAIS", "to": "9850591", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1234567", "label": "REDES SOCIAIS", "to": "9858386", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1234567", "label": "REDES SOCIAIS", "to": "9865115", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1234567", "label": "REDES SOCIAIS", "to": "9874429", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1409735", "label": "REDES SOCIAIS", "to": "9805251", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1417932", "label": "REDES SOCIAIS", "to": "9805251", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "1454480", "label": "REDES SOCIAIS", "to": "9805251", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "2001098", "label": "REDES SOCIAIS", "to": "9817098", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "2701668", "label": "REDES SOCIAIS", "to": "9805251", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9000026", "label": "REDES SOCIAIS", "to": "9817098", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9002120", "label": "REDES SOCIAIS", "to": "9805251", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9800942", "label": "REDES SOCIAIS", "to": "9805251", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9803851", "label": "REDES SOCIAIS", "to": "9805251", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9805555", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9808921", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9809242", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9809404", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9809567", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9811343", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9812843", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9816791", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9817483", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9819955", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9821280", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9823262", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9823824", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9824944", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9829357", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9837049", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9847437", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9848649", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9864871", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9881513", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9805251", "label": "REDES SOCIAIS", "to": "9887513", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9807721", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9813965", "label": "REDES SOCIAIS", "to": "9817098", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9813965", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9816439", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9816725", "label": "REDES SOCIAIS", "to": "9863001", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9817326", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9817653", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9817971", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9818776", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9819557", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9823302", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9824650", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9825515", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9827561", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9828698", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9836904", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9857927", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9866308", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9873906", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9876782", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817098", "label": "REDES SOCIAIS", "to": "9884410", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817100", "label": "REDES SOCIAIS", "to": "9831403", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9817100", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9822129", "label": "REDES SOCIAIS", "to": "9831403", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9823799", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9823799", "label": "REDES SOCIAIS", "to": "9863001", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9824105", "label": "REDES SOCIAIS", "to": "9857983", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9828718", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9829013", "label": "REDES SOCIAIS", "to": "9864830", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9829168", "label": "REDES SOCIAIS", "to": "9863001", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9830687", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9831403", "label": "REDES SOCIAIS", "to": "9871070", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9835573", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9845997", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9849375", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9851857", "label": "REDES SOCIAIS", "to": "9852967", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9852967", "label": "REDES SOCIAIS", "to": "9871070", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9852967", "label": "REDES SOCIAIS", "to": "9871675", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9852967", "label": "REDES SOCIAIS", "to": "9873879", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9855332", "label": "REDES SOCIAIS", "to": "9863001", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9857983", "label": "REDES SOCIAIS", "to": "9866822", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9857983", "label": "REDES SOCIAIS", "to": "9869168", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9857983", "label": "REDES SOCIAIS", "to": "9871080", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9859455", "label": "REDES SOCIAIS", "to": "9863001", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9863001", "label": "REDES SOCIAIS", "to": "9863198", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9864830", "label": "REDES SOCIAIS", "to": "9866650", "width": 1}, {"color": "#6699cc", "font": {"align": "middle", "color": "#ffffff", "size": 12, "strokeWidth": 0}, "from": "9864830", "label": "REDES SOCIAIS", "to": "9869330", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 1,
+            "gravitationalConstant": -20000,
+            "springConstant": 0.01,
+            "springLength": 250
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    
+    <script type="text/javascript">
+    (function() {
+        // Map Nome/CPF -> nodeId (lowercase keys)
+        var nodes_map = {"fabio passos de medeiros": "100494", "100494": "100494", "vanderson inacio de lima": "9817098", "9817098": "9817098", "silvano marques de oliveira": "100865", "100865": "100865", "daniel de jesus estevam": "9863001", "9863001": "9863001", "marcia de oliveira pereira": "101021", "101021": "101021", "carlos goes da silva": "101135", "101135": "101135", "marta helena de oliveira": "101207", "101207": "101207", "jonatas da silva araujo": "9852967", "9852967": "9852967", "vagner loiola dos santos": "101539", "101539": "101539", "paulo alves apolinario junior": "9831403", "9831403": "9831403", "elisangela alves de sousa": "101711", "101711": "101711", "valter gabriel rodrigues": "500014", "500014": "500014", "aurelio fortunato": "500063", "500063": "500063", "edmilson ferrarez alves": "500108", "500108": "500108", "matheus recco da rocha": "1234567", "1234567": "1234567", "daniel maia de brito": "9812005", "9812005": "9812005", "vanderlei tavares de carvalho": "9815889", "9815889": "9815889", "gustavo pires de souza": "9823668", "9823668": "9823668", "gilvan de jesus leandro": "9826376", "9826376": "9826376", "valdecio eloi marques junior": "9833790", "9833790": "9833790", "davyla daylha da silva matos": "9850591", "9850591": "9850591", "ygor lima amaral": "9858386", "9858386": "9858386", "manasses bezerra da silva": "9865115", "9865115": "9865115", "kaique kauan martins araujo": "9874429", "9874429": "9874429", "ronny pacheco almada": "1409735", "1409735": "1409735", "murillo dias santana": "9805251", "9805251": "9805251", "fabiano correia santana": "1417932", "1417932": "1417932", "fabio junio de freitas silva": "1454480", "1454480": "1454480", "marcio da costa basso ballerini": "2001098", "2001098": "2001098", "fernanda cristina alves de alcantara": "2701668", "2701668": "2701668", "fabio simoes tuca": "9000026", "9000026": "9000026", "celso seiki haruna": "9002120", "9002120": "9002120", "marcela nunes lepre rodrigues": "9800942", "9800942": "9800942", "ingrid milante da cruz": "9803851", "9803851": "9803851", "lais belisario sardinha": "9805555", "9805555": "9805555", "fernanda de franca cabral": "9808921", "9808921": "9808921", "rogerio de sousa barreto": "9809242", "9809242": "9809242", "luciana viudes salgado": "9809404", "9809404": "9809404", "maicon antunes alves": "9809567", "9809567": "9809567", "andreza cristovao barbosa silva": "9811343", "9811343": "9811343", "thais ribeiro de souza": "9812843", "9812843": "9812843", "renan moreira de alvorado": "9816791", "9816791": "9816791", "thais costa correa": "9817483", "9817483": "9817483", "felipe padovan": "9819955", "9819955": "9819955", "marina dos santos rafacho": "9821280", "9821280": "9821280", "anderson fassina": "9823262", "9823262": "9823262", "david mira amorim": "9823824", "9823824": "9823824", "iraci jesus dos santos": "9824944", "9824944": "9824944", "vander medeiro": "9829357", "9829357": "9829357", "gabriela lima gomes": "9837049", "9837049": "9837049", "heitor casado bertoni": "9847437", "9847437": "9847437", "paulo ricardo monari": "9848649", "9848649": "9848649", "everaldo andre da silva": "9864871", "9864871": "9864871", "cleiton lima da silva": "9881513", "9881513": "9881513", "erica presciliano assis fernandes": "9887513", "9887513": "9887513", "kenned sadi de franca": "9807721", "9807721": "9807721", "fabio rodrigo de oliveira": "9813965", "9813965": "9813965", "jackeline silva cardoso": "9816439", "9816439": "9816439", "renan santos de oliveira": "9816725", "9816725": "9816725", "everton freitas fidelis": "9817326", "9817326": "9817326", "josiane ribeiro da silva": "9817653", "9817653": "9817653", "carlos vinicius marculino da silva": "9817971", "9817971": "9817971", "clayton martins alves": "9818776", "9818776": "9818776", "jose augusto alves da luz": "9819557", "9819557": "9819557", "selma pinheiro felix": "9823302", "9823302": "9823302", "ronielli fernandes da silva": "9824650", "9824650": "9824650", "laise cristina dos santos": "9825515", "9825515": "9825515", "silvana quina dos santos": "9827561", "9827561": "9827561", "bruno campos dos santos": "9828698", "9828698": "9828698", "jailson silva santos": "9836904", "9836904": "9836904", "tainara nogueira pereira": "9857927", "9857927": "9857927", "maria rubia silva souza": "9866308", "9866308": "9866308", "paulo henrique fermiano de oliveira": "9873906", "9873906": "9873906", "thayna oliveira da silva": "9876782", "9876782": "9876782", "bianca batista da silva": "9884410", "9884410": "9884410", "allan dos santos fontes": "9817100", "9817100": "9817100", "leonardo de menezes guimaraes": "9822129", "9822129": "9822129", "priscila santana pereira": "9823799", "9823799": "9823799", "rogerio jose veloso": "9824105", "9824105": "9824105", "flaviana jesus de lima": "9857983", "9857983": "9857983", "igor antonio costa": "9828718", "9828718": "9828718", "meuli carolina de aragao": "9829013", "9829013": "9829013", "marcos matheus da silva perez": "9864830", "9864830": "9864830", "guilherme henrique de oliveira santos": "9829168", "9829168": "9829168", "gustavo miranda da silva": "9830687", "9830687": "9830687", "isabela de souza bueno": "9871070", "9871070": "9871070", "eduardo paulo amaral": "9835573", "9835573": "9835573", "laylla beatriz jovita dos santos": "9845997", "9845997": "9845997", "clovis lacerda da silva": "9849375", "9849375": "9849375", "tatiana aparecida da silva lourenco": "9851857", "9851857": "9851857", "beatriz lima batista barros": "9871675", "9871675": "9871675", "mariana cardoso abel": "9873879", "9873879": "9873879", "giovanna oliveira e silva": "9855332", "9855332": "9855332", "rizelia macare de almeida santos": "9866822", "9866822": "9866822", "janaina pereira de sousa": "9869168", "9869168": "9869168", "bruna da silva albuquerque": "9871080", "9871080": "9871080", "mateus dos santos feitosa": "9859455", "9859455": "9859455", "rafael zampier": "9863198", "9863198": "9863198", "liliane venturini": "9866650", "9866650": "9866650", "paloma luciana guedes dos santos": "9869330", "9869330": "9869330"};
+
+        // Cores e tamanhos (atualizados do Python)
+        var defaultNodeColor = '#079606';
+        var highlightNodeColor = '#ffc107';
+        var defaultEdgeColor = '#6699cc';
+        var highlightEdgeColor = '#28a745'; // Linha Verde
+        var edgeHighlightFontOptions = {"color": "#ffffff", "strokeWidth": 2, "strokeColor": "#000000", "align": "middle", "size": 12};
+        var defaultNodeSize = 15;
+        var highlightNodeSize = 30;
+        var adjNodeSize = 20;
+        var defaultEdgeWidth = 1;
+        var highlightEdgeWidth = 4;
+
+        // Armazena as cores/tamanhos originais por ID para reset mais preciso
+        var originalNodeProperties = {}; 
+
+        // Resolve os datasets nodes/edges do PyVis (várias heurísticas)
+        function resolveDatasets() {
+            var resolved = { nodes: null, edges: null };
+            try {
+                if (typeof window.nodes !== 'undefined' && typeof window.edges !== 'undefined') {
+                    resolved.nodes = window.nodes;
+                    resolved.edges = window.edges;
+                } else if (typeof nodes !== 'undefined' && typeof edges !== 'undefined') {
+                    resolved.nodes = nodes;
+                    resolved.edges = edges;
+                } else if (typeof network !== 'undefined' && network && network.body && network.body.data) {
+                    resolved.nodes = network.body.data.nodes;
+                    resolved.edges = network.body.data.edges;
+                } else {
+                    for (var k in window) {
+                        try {
+                            var v = window[k];
+                            if (v && typeof v.get === 'function' && typeof v.add === 'function') {
+                                if (!resolved.nodes) resolved.nodes = v;
+                                else if (!resolved.edges) resolved.edges = v;
+                            }
+                        } catch(e) {}
+                        if (resolved.nodes && resolved.edges) break;
+                    }
+                }
+            } catch (e) {
+                console.warn("Erro ao resolver datasets:", e);
+            }
+            return resolved;
+        }
+
+        // Aguarda o objeto 'network' e os datasets estarem prontos
+        function waitForNetwork(callback, timeoutMs) {
+            var start = Date.now();
+            (function check() {
+                if (typeof network !== 'undefined' && network && (typeof window.nodes !== 'undefined' || (network.body && network.body.data))) {
+                    callback();
+                } else {
+                    if (Date.now() - start > (timeoutMs || 5000)) {
+                        console.error("Tempo esgotado esperando o objeto 'network' do PyVis.");
+                    } else {
+                        setTimeout(check, 100);
+                    }
+                }
+            })();
+        }
+
+        waitForNetwork(function() {
+            var ds = resolveDatasets();
+            var nodes = ds.nodes;
+            var edges = ds.edges;
+
+            if (!nodes || !edges) {
+                console.error("Não foi possível localizar os datasets 'nodes' e 'edges'. As funcionalidades de busca/destaque ficarão limitadas.");
+                document.getElementById('searchStatus').innerText = 'Erro: datasets não encontrados.';
+                return;
+            }
+
+            // Preenche o mapa de propriedades originais
+            nodes.get().forEach(function(n) {
+                originalNodeProperties[n.id] = { color: n.color, size: n.size || defaultNodeSize };
+            });
+
+            // NOVO: Força a cor de seleção das arestas para o verde (highlightEdgeColor)
+            try {
+                if (typeof network !== 'undefined' && network) {
+                    network.setOptions({
+                        edges: {
+                            selectionWidth: function(width) { return width * 1.5; },
+                            selected: {
+                                color: highlightEdgeColor, 
+                                width: highlightEdgeWidth
+                            },
+                            hover: {
+                                color: highlightEdgeColor 
+                            }
+                        }
+                    });
+                }
+            } catch(e) {
+                console.warn("Erro ao definir opções de seleção de arestas:", e);
+            }
+
+
+            // Função para resetar grafo para estilo padrão
+            function resetGraph() {
+                var nodeUpdates = [];
+                var edgeUpdates = [];
+
+                // Reset nós (voltando para a cor ORIGINAL)
+                try {
+                    nodes.get().forEach(function(n) {
+                        var original = originalNodeProperties[n.id];
+                        // Se houver propriedade original, usa, senão usa o default
+                        var color = original ? original.color : defaultNodeColor;
+                        var size = original ? original.size : defaultNodeSize;
+
+                        nodeUpdates.push({ id: n.id, color: color, size: size, font: { color: '#ffffff', bold: false } });
+                    });
+                    nodes.update(nodeUpdates);
+                } catch(e) {
+                    console.warn("Falha ao resetar nós:", e);
+                }
+
+                // Reset arestas
+                try {
+                    edges.get().forEach(function(e) {
+                        // Reseta a aresta para a cor padrão e remove o destaque da fonte
+                        edgeUpdates.push({ id: e.id, color: { color: defaultEdgeColor }, width: defaultEdgeWidth, font: { color: '#ffffff', strokeWidth: 0 } });
+                    });
+                    edges.update(edgeUpdates);
+                } catch(e) {
+                    console.warn("Falha ao resetar arestas:", e);
+                }
+
+                // Limpa seleções
+                if (typeof network !== 'undefined' && network) {
+                    network.unselectAll();
+                }
+
+                document.getElementById('searchStatus').innerHTML = '';
+            }
+
+            // Função que destaca um nó único (usada ao clicar)
+            function highlightSingleNode(nodeId) {
+                // Limpa seleções antes de começar (fundamental para evitar o cinza)
+                if (typeof network !== 'undefined' && network) {
+                    network.unselectAll();
+                }
+                resetGraph(); 
+
+                try {
+                    // Destaque do nó (amarelo)
+                    nodes.update([{ id: nodeId, color: highlightNodeColor, size: highlightNodeSize, font: { color: '#ffffff', bold: true } }]);
+                } catch(e) {
+                    console.warn("Erro ao destacar nó único:", e);
+                }
+
+                try {
+                    var connectedEdges = network.getConnectedEdges(nodeId);
+                    var connectedNodes = network.getConnectedNodes(nodeId);
+
+                    var nodeUpdates = [];
+                    var edgeUpdates = [];
+                    var edgesToSelect = [];
+
+                    connectedNodes.forEach(function(adjNodeId) {
+                        if (adjNodeId != nodeId) {
+                            // Destaque de adjacentes
+                            nodeUpdates.push({ id: adjNodeId, color: highlightNodeColor, size: adjNodeSize, font: { color: '#ffffff' } });
+                        }
+                    });
+                    nodes.update(nodeUpdates);
+
+                    connectedEdges.forEach(function(edgeId) {
+                        // FORÇA A COR VERDE NO DATASET DA ARESTA E APLICA O ESTILO DE FONTE DESTAQUE
+                        edgeUpdates.push({ 
+                            id: edgeId, 
+                            color: { color: highlightEdgeColor }, 
+                            width: highlightEdgeWidth, 
+                            font: edgeHighlightFontOptions
+                        });
+                        edgesToSelect.push(edgeId);
+                    });
+                    edges.update(edgeUpdates); // Atualiza o Dataset primeiro
+
+                    // Reintroduzindo: Seleciona as arestas. Como setOptions forçou a cor de seleção para verde, isso deve aplicar o verde.
+                    network.selectEdges(edgesToSelect); 
+
+                    network.focus(nodeId, { scale: 1.0, animation: true });
+                } catch(e) {
+                    console.warn("Erro ao destacar conexões do nó:", e);
+                }
+
+                document.getElementById('searchStatus').innerHTML = '<span style="color: ' + highlightEdgeColor + ';">Pessoa selecionada</span>';
+            }
+
+            // Função de busca/destaque por texto (substring) - seleciona TODOS os matches
+            function searchNode() {
+                var rawQuery = document.getElementById('searchBox').value.trim();
+                var query = rawQuery.toLowerCase();
+                if (!query) return;
+
+                // Limpa seleções
+                if (typeof network !== 'undefined' && network) {
+                    network.unselectAll();
+                }
+                // Reset antes de aplicar
+                resetGraph();
+
+                // 1) Tenta match por chave exata no mapa (nome ou CPF)
+                var exact = nodes_map[query];
+
+                // 2) Busca por substring nos labels
+                var matched = [];
+                try {
+                    var all = nodes.get();
+                    for (var i=0;i<all.length;i++) {
+                        var lbl = (all[i].label || '').toString().toLowerCase();
+                        var idStr = (all[i].id || '').toString().toLowerCase();
+                        if (lbl.indexOf(query) !== -1 || idStr.indexOf(query) !== -1) {
+                            matched.push(all[i]);
+                        }
+                    }
+                } catch(e) {
+                    console.warn("Erro ao iterar nodes.get():", e);
+                }
+
+                // Se não encontrou por substring mas existe chave exata no mapa (pode ser CPF)
+                if (matched.length === 0 && exact) {
+                    // pega node via id
+                    try {
+                        var single = nodes.get(exact);
+                        if (single) matched.push(single);
+                    } catch(e) {}
+                }
+
+                if (matched.length === 0) {
+                    document.getElementById('searchStatus').innerHTML = '<span style="color: #dc3545;">Pessoa não encontrada.</span>';
+                    return;
+                }
+
+                // Lista de IDs de arestas para selecionar no final
+                var edgesToSelect = [];
+
+                // Se só existir 1 match
+                if (matched.length === 1) {
+                    var node = matched[0];
+                    // Destaque do nó (amarelo)
+                    nodes.update([{ id: node.id, color: highlightNodeColor, size: highlightNodeSize, font: { color: '#ffffff', bold: true } }]);
+
+                    // destaca conexões
+                    try {
+                        var connectedEdges = network.getConnectedEdges(node.id);
+                        var connectedNodes = network.getConnectedNodes(node.id);
+
+                        var nodeUpdates = [];
+                        var edgeUpdates = [];
+
+                        connectedNodes.forEach(function(adjNodeId) {
+                            if (adjNodeId != node.id) {
+                                nodeUpdates.push({ id: adjNodeId, color: highlightNodeColor, size: adjNodeSize, font: { color: '#ffffff' } });
+                            }
+                        });
+                        nodes.update(nodeUpdates);
+
+                        connectedEdges.forEach(function(edgeId) {
+                            // FORÇA A COR VERDE NO DATASET DA ARESTA
+                            edgeUpdates.push({ 
+                                id: edgeId, 
+                                color: { color: highlightEdgeColor }, 
+                                width: highlightEdgeWidth, 
+                                font: edgeHighlightFontOptions
+                            });
+                            edgesToSelect.push(edgeId);
+                        });
+                        edges.update(edgeUpdates); // Atualiza o Dataset primeiro
+
+                        network.selectEdges(edgesToSelect); // Seleciona para 'travar' o estilo
+                    } catch(e) {
+                        console.warn("Erro ao destacar conexões do único match:", e);
+                    }
+
+                    // foco suave no único
+                    try {
+                        network.focus(node.id, { scale: 1.3, animation: true });
+                    } catch(e) { /* ignore */ }
+
+                    document.getElementById('searchStatus').innerHTML = '<span style="color: ' + highlightEdgeColor + ';">1 pessoa encontrada</span>';
+                    return;
+                }
+
+                // Caso múltiplos matches -> destacar todos e enquadrar
+                var nodeUpdates = [];
+                var edgeUpdates = [];
+
+                var matchedIds = matched.map(function(n){ return n.id; });
+
+                matched.forEach(function(n) {
+                    // Destaque dos nós
+                    nodeUpdates.push({ id: n.id, color: highlightNodeColor, size: adjNodeSize, font: { color: '#ffffff' } });
+                });
+                nodes.update(nodeUpdates);
+
+                // Destaca arestas que conectam a qualquer nó encontrado
+                try {
+                    var allEdges = edges.get();
+                    allEdges.forEach(function(e) {
+                        if (matchedIds.indexOf(e.from) !== -1 || matchedIds.indexOf(e.to) !== -1) {
+                            // FORÇA A COR VERDE NO DATASET DA ARESTA
+                            edgeUpdates.push({ 
+                                id: e.id, 
+                                color: { color: highlightEdgeColor }, 
+                                width: highlightEdgeWidth, 
+                                font: edgeHighlightFontOptions
+                            });
+                            edgesToSelect.push(e.id);
+                        }
+                    });
+                    edges.update(edgeUpdates); // Atualiza o Dataset primeiro
+
+                    network.selectEdges(edgesToSelect); // Seleciona para 'travar' o estilo
+                } catch(e) {
+                    console.warn("Erro ao destacar arestas para múltiplos matches:", e);
+                }
+
+                // Enquadrar grupo: calcula bounding box média e faz moveTo com scale razoável
+                try {
+                    var positions = network.getPositions(matchedIds);
+                    var xs = matchedIds.map(function(id){ return positions[id].x; });
+                    var ys = matchedIds.map(function(id){ return positions[id].y; });
+                    var minX = Math.min.apply(null, xs);
+                    var maxX = Math.max.apply(null, xs);
+                    var minY = Math.min.apply(null, ys);
+                    var maxY = Math.max.apply(null, ys);
+                    var centerX = (minX + maxX) / 2;
+                    var centerY = (minY + maxY) / 2;
+
+                    var dx = maxX - minX;
+                    var dy = maxY - minY;
+                    var extent = Math.max(dx, dy);
+                    var scale = 0.9;
+                    if (extent > 0) {
+                        scale = Math.max(0.3, Math.min(1.4, 700 / extent));
+                    }
+                    network.moveTo({ position: { x: centerX, y: centerY }, scale: scale, animation: true });
+                } catch(e) {
+                    console.warn("Erro ao enquadrar múltiplos matches:", e);
+                }
+
+                document.getElementById('searchStatus').innerHTML = '<span style="color: ' + highlightEdgeColor + ';">' + matched.length + ' pessoas encontradas</span>';
+            }
+
+            // Eventos: botão, enter, reset
+            var searchBtn = document.getElementById('searchBtn');
+            var resetBtn = document.getElementById('resetBtn');
+            var searchBox = document.getElementById('searchBox');
+
+            if (searchBtn) searchBtn.addEventListener('click', searchNode);
+            if (resetBtn) resetBtn.addEventListener('click', resetGraph);
+            if (searchBox) {
+                searchBox.addEventListener('keyup', function(e) {
+                    if (e.key === 'Enter') searchNode();
+                });
+            }
+
+            // Clique em nó: selecionar apenas o nó clicado (com seus adjacentes)
+            network.on("selectNode", function(params) {
+                if (params.nodes && params.nodes.length === 1) {
+                    var selectedNodeId = params.nodes[0];
+                    // destacar somente o nó clicado
+                    highlightSingleNode(selectedNodeId);
+                    // atualizar a caixa de busca com o label do nó clicado
+                    try {
+                        var nodeData = nodes.get(selectedNodeId);
+                        document.getElementById('searchBox').value = nodeData.label || selectedNodeId;
+                    } catch(e) {
+                        document.getElementById('searchBox').value = selectedNodeId;
+                    }
+                } else {
+                    resetGraph();
+                }
+            });
+
+            // Clique no fundo: limpa
+            network.on("click", function(params) {
+                if ((!params.nodes || params.nodes.length === 0) && (!params.edges || params.edges.length === 0)) {
+                    resetGraph();
+                }
+            });
+        });
+    })();
+    </script>
+    </body>
+</html>
