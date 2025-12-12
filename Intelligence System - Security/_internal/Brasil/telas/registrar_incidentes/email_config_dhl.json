@@ -1,0 +1,7 @@
+{
+    "smtp_server": "smtp.dhl.com",
+    "smtp_port": 25,
+    "sender_email": "tiago.moreirap@dhl.com",
+    "sender_password": "Security302416*",
+    "default_recipient": "tiago.moreirap@dhl.com"
+}
