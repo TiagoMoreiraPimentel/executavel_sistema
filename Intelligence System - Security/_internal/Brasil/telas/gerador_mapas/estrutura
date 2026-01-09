@@ -1,0 +1,11 @@
+projeto_mapa/
+├── main.py
+├── ui_helpers.py
+├── file_selector.py
+├── data_parsers.py
+├── map_components.py
+├── filter_manager.py
+├── annotation_system.py
+├── map_builder.py
+├── requirements.txt
+└── color_picker_ui.py
