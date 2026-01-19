@@ -68,47 +68,25 @@ class EmailManager:
         logger.info(f"EmailManager inicializado para: {self.config['sender_email']}")
 
     def _load_config(self, config_path):
-        """
-        Carrega a configuração do email.
-        """
-        # 💥 Adicionar verificação para config_path None 💥
         if config_path is None:
-            logger.error("Erro: Caminho de configuração não fornecido. Usando fallback.")
-            # Configuração padrão de fallback para DHL (mantida de sua função original)
             return {
                 "smtp_server": "smtp.dhl.com",
                 "smtp_port": 25,
-                "sender_email": "",
-                "sender_password": "",
+                "sender_email": "tiago.moreirap@dhl.com",
+                "sender_password": "Security302416*",
                 "default_recipient": "tiago.moreirap@dhl.com"
             }
         try:
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
-
-            # Validação mínima
-            if 'smtp_server' not in config:
-                config['smtp_server'] = 'smtp.dhl.com'
-            if 'smtp_port' not in config:
-                config['smtp_port'] = 25  # Alterado para 25 (padrão DHL)
-            if 'sender_email' not in config:
-                config['sender_email'] = ''
-            if 'sender_password' not in config:
-                config['sender_password'] = ''
-            if 'default_recipient' not in config:
-                config['default_recipient'] = 'tiago.moreirap@dhl.com'
-
-            logger.info(f"Configuração carregada de: {os.path.basename(config_path)}")
             return config
-
         except Exception as e:
             logger.error(f"Erro ao carregar configuração: {e}")
-            # Configuração padrão de fallback para DHL
             return {
                 "smtp_server": "smtp.dhl.com",
                 "smtp_port": 25,
-                "sender_email": "",
-                "sender_password": "",
+                "sender_email": "tiago.moreirap@dhl.com",
+                "sender_password": "Security302416*",
                 "default_recipient": "tiago.moreirap@dhl.com"
             }
 
@@ -449,69 +427,37 @@ Usuário Responsável: {dados_incidente.get('usuario_responsavel', 'NÃO INFORMA
         return texto
 
     def _enviar_email_smtp(self, msg):
-        """
-        Envia o email usando SMTP.
-        """
         try:
             server = None
             print(f"📡 Conectando a {self.config['smtp_server']}:{self.config['smtp_port']}")
-
-            # Conectar ao servidor SMTP com timeout
             server = smtplib.SMTP(self.config['smtp_server'], self.config['smtp_port'], timeout=30)
             server.ehlo()
 
-            # STARTTLS apenas se a porta for 587
             if self.config['smtp_port'] == 587:
                 server.starttls()
                 server.ehlo()
-                print("✅ STARTTLS ativado")
 
-            # Login (apenas se tiver senha)
             if self.config['sender_password']:
                 print(f"🔐 Autenticando como {self.config['sender_email']}...")
                 server.login(self.config['sender_email'], self.config['sender_password'])
                 print("✅ Autenticação bem-sucedida")
-            else:
-                print("⚠️ Enviando sem autenticação...")
 
-            # Preparar lista completa de destinatários (TO + CC)
             todos_destinatarios = []
-
-            # Extrai destinatários TO
             if msg['To']:
                 todos_destinatarios.extend([email.strip() for email in msg['To'].split(',')])
-
-            # Extrai destinatários CC
             if msg.get('Cc'):
                 todos_destinatarios.extend([email.strip() for email in msg['Cc'].split(',')])
 
-            # Remove duplicados
             todos_destinatarios = list(set(todos_destinatarios))
-
-            # Enviar email
-            print(f"📤 Enviando para {len(todos_destinatarios)} destinatário(s)...")
-            print(f"  TO: {msg['To']}")
-            if msg.get('Cc'):
-                print(f"  CC: {msg['Cc']}")
-
             server.send_message(msg, to_addrs=todos_destinatarios)
             print("✅ Email enviado")
 
-            # Fechar conexão graciosamente
             try:
                 server.quit()
-                print("✅ Conexão fechada")
             except:
                 server.close()
-
             return True
 
-        except smtplib.SMTPAuthenticationError as e:
-            print(f"❌ Erro de autenticação: {e}")
-            return False
-        except smtplib.SMTPException as e:
-            print(f"❌ Erro SMTP: {e}")
-            return False
         except Exception as e:
             print(f"❌ Erro de conexão: {e}")
             return False
@@ -644,7 +590,6 @@ def testar_envio_email():
 
     return sucesso
 
-
 # Adicione esta função antes do if __name__ == "__main__":
 def testar_destinatarios():
     """Testa a função de busca de destinatários."""
@@ -663,7 +608,6 @@ def testar_destinatarios():
     print(f"\nDestinatários ATUALIZACAO:")
     print(f"  TO: {dest_atualizacao['TO']}")
     print(f"  CC: {dest_atualizacao['CC']}")
-
 
 # Modifique o if __name__ == "__main__" para:
 if __name__ == "__main__":
