@@ -1,17 +1,16 @@
 """
-Construtor principal do mapa - Versão com Cores Dinâmicas e Correção de Erros.
+Construtor principal do mapa - Versão com Checkpoints Temporários.
 """
 import folium
 from typing import List, Dict, Optional
 from map_components import MapMarkerFactory, MapControls
 from filter_manager import FilterManager
-from annotation_system import AnnotationSystem
+from checkpoint_system import CheckpointSystem  # Substituído
 from ui_helpers import (
     html_escape,
     get_vehicle_color,
     get_vehicle_marker_color
 )
-
 
 class MapBuilder:
     def __init__(self, center_location: List[float], zoom_start: int = 12):
@@ -27,7 +26,7 @@ class MapBuilder:
         # Componentes
         self.map_controls = MapControls()
         self.filter_manager = FilterManager()
-        self.annotation_system = AnnotationSystem(self.map_name)
+        self.checkpoint_system = CheckpointSystem(self.map_name)  # Substituído
 
         # Adicionar controles básicos
         self.map_controls.add_measure_control(self.mapa)
@@ -76,7 +75,7 @@ class MapBuilder:
         self.total_markers = max_points
 
     def add_filter_system(self, eventos_unicos: List[str],
-                          categorias_unicas: List[str]) -> None:
+                         categorias_unicas: List[str]) -> None:
         """Adiciona sistema de filtros injetando as cores iniciais da interface."""
         # 1. HTML do Filtro
         filter_html = self.filter_manager.build_filter_html(
@@ -118,9 +117,9 @@ class MapBuilder:
 
             data['group'].add_to(self.mapa)
 
-        # Injetar o JavaScript de anotações
-        annotation_js = self.annotation_system.get_annotation_js()
-        self.mapa.get_root().html.add_child(folium.Element(annotation_js))
+        # Injetar o JavaScript de checkpoints (substituiu anotações)
+        checkpoint_js = self.checkpoint_system.get_checkpoint_js()
+        self.mapa.get_root().html.add_child(folium.Element(checkpoint_js))
 
         # Adicionar controle de camadas
         self.map_controls.add_layer_control(self.mapa, collapsed=False)
