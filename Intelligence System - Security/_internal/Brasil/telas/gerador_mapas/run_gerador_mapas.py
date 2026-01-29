@@ -1,3 +1,5 @@
+#run_gerador_mapas.py
+
 import sys
 import os
 import webbrowser

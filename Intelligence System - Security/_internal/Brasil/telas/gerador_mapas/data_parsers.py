@@ -106,43 +106,39 @@ class ExcelParser:
         self.df_grouped = None
 
     def parse(self) -> pd.DataFrame:
-        """Carrega e processa o arquivo Excel unificando Tipo/Veículo."""
+        """Carrega o Excel e unifica Tipo/Veículo e NOME_PESSOA."""
         self.df = pd.read_excel(self.excel_path)
 
-        # 1. Converter e validar Datas primeiro
-        self.df['Data/Hora'] = pd.to_datetime(
-            self.df['Data/Hora'],
-            dayfirst=True,
-            errors='coerce'
-        )
+        # 1. Datas e Limpeza
+        self.df['Data/Hora'] = pd.to_datetime(self.df['Data/Hora'], dayfirst=True, errors='coerce')
         self.df = self.df.dropna(subset=['Data/Hora', 'Latitude', 'Longitude'])
         self.df = self.df.sort_values('Data/Hora')
 
-        # 2. Unificar a coluna de Categoria (Tipo ou Veículo)
+        # 2. Tratamento do campo NOME_PESSOA
+        if 'NOME_PESSOA' not in self.df.columns:
+            self.df['NOME_PESSOA'] = ""
+        else:
+            self.df['NOME_PESSOA'] = self.df['NOME_PESSOA'].fillna("").astype(str).str.strip()
+
+        # 3. Unificar Categoria (Tipo ou Veículo)
         if 'Tipo' in self.df.columns:
             self.df['Tipo'] = self.df['Tipo'].astype(str).str.strip()
         elif 'Veículo' in self.df.columns:
-            # Renomeia para 'Tipo' internamente para o resto do sistema funcionar
             self.df = self.df.rename(columns={'Veículo': 'Tipo'})
             self.df['Tipo'] = self.df['Tipo'].astype(str).str.strip()
         else:
             self.df['Tipo'] = 'Geral'
 
-        # 3. Limpeza básica
-        self.df['Ignição'] = self.df['Ignição'].fillna('D')
-        self.df['Evento'] = self.df['Evento'].fillna('POSIÇÃO')
-        self.df['Observações'] = self.df['Observações'].fillna('')
-
-        # 4. Agrupar os dados por Coordenadas e o novo campo 'Tipo'
-        # Usamos o groupby por 'Tipo' agora (seja ele vindo de Tipo ou Veículo)
+        # 4. Agrupar os dados (Mantendo o NOME_PESSOA vivo)
         self.df_grouped = self.df.groupby(['Latitude', 'Longitude', 'Tipo'], sort=False).agg({
             'Data/Hora': list,
             'Evento': list,
             'Ignição': 'last',
-            'Observações': list
+            'Observações': list,
+            'NOME_PESSOA': 'first' # PEGA O NOME PARA O MARCADOR
         }).reset_index()
 
-        # 5. Adicionar data inicial para ordenação correta das linhas e numeração
+        # 5. Ordenação
         self.df_grouped['Data_Inicial'] = self.df_grouped['Data/Hora'].apply(lambda x: min(x) if x else None)
         self.df_grouped = self.df_grouped.sort_values('Data_Inicial').reset_index(drop=True)
 

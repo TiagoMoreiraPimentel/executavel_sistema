@@ -1,5 +1,8 @@
 """
+annotation_system.py
+
 Sistema de anotações arrastáveis para o mapa.
+
 """
 import folium
 from ui_helpers import html_escape
