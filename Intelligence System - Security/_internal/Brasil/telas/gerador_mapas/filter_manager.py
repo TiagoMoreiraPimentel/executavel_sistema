@@ -156,7 +156,7 @@ class FilterManager:
                     el.style.height = '18px';
                 }} else if (checkDataHora.checked) {{
                     sDH.style.display = 'block';
-                    el.style.width = '75px';
+                    el.style.width = '110px';
                     el.style.borderRadius = '4px';
                     el.style.height = '18px';
                     el.style.padding = '0';
