@@ -5,7 +5,7 @@ projeto_mapa/
 ├── data_parsers.py
 ├── map_components.py
 ├── filter_manager.py
-├── annotation_system.py
+├── checkpoint_system.py
 ├── map_builder.py
 ├── requirements.txt
 └── color_picker_ui.py
