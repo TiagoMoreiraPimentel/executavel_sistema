@@ -3,7 +3,7 @@
     "smtp_port": 25,
     "sender_email": "system.incon@dhl.com",
     "auth_user": "tiago.moreirap@dhl.com",
-    "sender_password": "Security302416*",
+    "sender_password": "Security302416**",
     "default_recipient": "tiago.moreirap@dhl.com",
     "use_tls": true,
     "use_ssl": false

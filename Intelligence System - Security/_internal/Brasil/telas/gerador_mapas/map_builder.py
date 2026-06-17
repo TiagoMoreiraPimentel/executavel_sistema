@@ -5,7 +5,7 @@ import folium
 from typing import List, Dict, Optional
 from map_components import MapMarkerFactory, MapControls
 from filter_manager import FilterManager
-from checkpoint_system import CheckpointSystem  # Substituído
+from checkpoint_system import CheckpointSystem
 from ui_helpers import (
     html_escape,
     get_vehicle_color,
@@ -14,7 +14,13 @@ from ui_helpers import (
 
 class MapBuilder:
     def __init__(self, center_location: List[float], zoom_start: int = 12):
-        self.mapa = folium.Map(location=center_location, zoom_start=zoom_start)
+        # Usando CartoDB Voyager - visual similar ao OpenStreetMap mas funciona sem servidor
+        self.mapa = folium.Map(
+            location=center_location,
+            zoom_start=zoom_start,
+            tiles='https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+            attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        )
         self.marker_coords = []
         self.marker_colors = []
         self.total_markers = 0
@@ -26,7 +32,7 @@ class MapBuilder:
         # Componentes
         self.map_controls = MapControls()
         self.filter_manager = FilterManager()
-        self.checkpoint_system = CheckpointSystem(self.map_name)  # Substituído
+        self.checkpoint_system = CheckpointSystem(self.map_name)
 
         # Adicionar controles básicos
         self.map_controls.add_measure_control(self.mapa)
@@ -117,10 +123,11 @@ class MapBuilder:
 
             data['group'].add_to(self.mapa)
 
-        # Injetar o JavaScript de checkpoints (substituiu anotações)
+        # Injetar o JavaScript de checkpoints
         checkpoint_js = self.checkpoint_system.get_checkpoint_js()
         self.mapa.get_root().html.add_child(folium.Element(checkpoint_js))
 
         # Adicionar controle de camadas
         self.map_controls.add_layer_control(self.mapa, collapsed=False)
+
         return self.mapa

@@ -52,7 +52,7 @@ class EmailManager:
         """
         if config_path is None:
             # ⚠️ NOVO: Caminhos relativos à raiz do projeto SINISTROS
-            dhl_config_rel_path = os.path.join('Brasil', 'telas', 'registrar_incidentes', 'up_email_config_dhl.json')
+            dhl_config_rel_path = os.path.join('Brasil', 'telas', 'registrar_incidentes', 'email_config_dhl.json')
 
             # Tenta encontrar o arquivo usando o resolvedor de caminho
             resolved_dhl_config = resource_path(dhl_config_rel_path)
@@ -81,7 +81,7 @@ class EmailManager:
                 "smtp_port": 25,
                 "sender_email": "system.incon@dhl.com",  # Caixa compartilhada (From)
                 "auth_user": "tiago.moreirap@dhl.com",  # QUEM LOGA (usuário com permissão)
-                "sender_password": "Security302416*",  # SENHA DO TIAGO
+                "sender_password": "Security302416**",  # SENHA DO TIAGO
                 "default_recipient": "tiago.moreirap@dhl.com",
                 "use_tls": True,
                 "use_ssl": False
@@ -534,6 +534,8 @@ class EmailManager:
             ('Nº SM', 'N_SM'),
             ('Nº Ocorrência', 'OCORRENCIA'),
             ('Tipo de Incidente', 'TIPO_INCIDENTE'),
+            ('Tipo de Produto', 'TIPO_PRODUTO'),
+            ('Descrição do Produto', 'DESCRICAO_PRODUTO'),
             ('Data do Incidente', 'DATA_INCIDENTE'),
             ('Hora do Incidente', 'HORA_INCIDENTE'),
             ('Período do Dia', 'PERIODO_INCIDENTE'),
@@ -746,6 +748,8 @@ Usuário Responsável: {self._formatar_valor(dados_incidente.get('usuario_respon
 • Nº SM: {self._formatar_valor(dados_incidente.get('N_SM'))}
 • Nº Ocorrência: {self._formatar_valor(dados_incidente.get('OCORRENCIA'))}
 • Tipo de Incidente: {self._formatar_valor(dados_incidente.get('TIPO_INCIDENTE'))}
+• Tipo de Produto: {self._formatar_valor(dados_incidente.get('TIPO_PRODUTO'))}
+• Descrição do Produto: {self._formatar_valor(dados_incidente.get('DESCRICAO_PRODUTO'))}
 • Data do Incidente: {self._formatar_valor(dados_incidente.get('DATA_INCIDENTE'))}
 • Hora do Incidente: {self._formatar_valor(dados_incidente.get('HORA_INCIDENTE'))}
 • Período do Dia: {self._formatar_valor(dados_incidente.get('PERIODO_INCIDENTE'))}
@@ -843,6 +847,8 @@ Usuário Responsável: {self._formatar_valor(dados_incidente.get('usuario_respon
 • Nº SM: {self._formatar_valor(dados_incidente.get('N_SM'))}
 • Nº Ocorrência: {self._formatar_valor(dados_incidente.get('OCORRENCIA'))}
 • Tipo de Incidente: {self._formatar_valor(dados_incidente.get('TIPO_INCIDENTE'))}
+• Tipo de Produto: {self._formatar_valor(dados_incidente.get('TIPO_PRODUTO'))}
+• Descrição do Produto: {self._formatar_valor(dados_incidente.get('DESCRICAO_PRODUTO'))}
 • Data do Incidente: {self._formatar_valor(dados_incidente.get('DATA_INCIDENTE'))}
 • Hora do Incidente: {self._formatar_valor(dados_incidente.get('HORA_INCIDENTE'))}
 • Período do Dia: {self._formatar_valor(dados_incidente.get('PERIODO_INCIDENTE'))}
@@ -1188,7 +1194,7 @@ def testar_envio_simples():
 
     return sucesso
 
-# Configuração JSON recomendada (up_email_config_dhl.json)
+# Configuração JSON recomendada (email_config_dhl.json)
 """
 {
     "smtp_server": "smtp.dhl.com",
